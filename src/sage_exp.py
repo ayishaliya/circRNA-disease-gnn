@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 from torch_geometric.nn import HeteroConv, SAGEConv
 
+
+
 class HeteroGraphSAGE(nn.Module):
     """
     3-layer heterogeneous GraphSAGE

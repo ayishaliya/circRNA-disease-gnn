@@ -1,0 +1,92 @@
+tried put features... results in feature_results.txt
+
+added an extra hidden layer... due to kernel issues had to restart kernel each time changes made to model
+
+Residual connections from input features to output suppress the contribution of higher-order neighborhood information, causing the model to rely excessively on handcrafted centrality features.
+| Setting        | AUC   |
+| -------------- | ----- |
+| With residuals | ~0.80 |
+| No residuals   | ~0.92 |
+“Removing input-level residual connections significantly improved performance, indicating that deeper message passing is essential for capturing circRNA–disease associations beyond handcrafted node centralities.”
+Although a four-layer model achieved slightly higher predictive performance, we selected the three-layer architecture as the final model due to its better trade-off between performance, stability, and interpretability. Deeper architectures risk oversmoothing and obscure biological semantics in heterogeneous molecular graphs.
+
+We evaluated different residual connection strategies to assess their impact on heterogeneous message passing. Input-level residuals significantly degraded performance, indicating excessive reliance on node centrality features. Layer-wise residuals partially mitigated this issue but introduced higher variance and reduced predictive performance. The best results were achieved without residual connections, suggesting that explicit relational aggregation is critical for learning biologically meaningful circRNA–disease representations.
+
+We conducted extensive ablation studies to analyze the effects of depth, residual connections, and decoder design. Input-level residuals significantly degraded performance, while layer-wise residuals introduced instability without improving predictive accuracy. Replacing the dot-product decoder with a multi-layer perceptron did not yield consistent gains, indicating that cosine-based similarity is sufficient for modeling circRNA–disease associations. Although a four-layer model achieved the highest performance, we selected a three-layer architecture as the final model due to its superior balance between accuracy, stability, and biological interpretability.
+✅ FINAL MODEL (what you should keep)
+
+3-layer HeteroGraphSAGE, no residuals, dot-product decoder
+
+Why?
+
+Best balance of:
+
+performance
+
+stability
+
+interpretability
+
+Lower variance than deeper models
+
+Strong biological justification
+
+🔹 A. 3-layer, NO residuals, dot-product decoder
+
+(baseline / main candidate)
+
+AUC: 0.925 ± 0.006
+
+AUPR: 0.600 ± 0.029
+
+Stable
+
+Low variance
+
+Clean semantics
+
+🔹 B. 3-layer, input residuals
+
+AUC: 0.798
+
+AUPR: 0.449
+
+Clearly harmful
+
+✅ Strong negative evidence.
+
+🔹 C. 3-layer, layer-wise residuals
+
+AUC: 0.859 ± 0.031
+
+AUPR: 0.501 ± 0.034
+
+Higher variance
+
+Worse than no-residuals
+
+✅ Residuals do not help here.
+
+🔹 D. 3-layer, MLP decoder
+
+AUC: 0.897 ± 0.009
+
+AUPR: 0.574 ± 0.043
+
+Worse than dot product
+
+Much higher loss variance
+
+⚠️ Decoder expressiveness ≠ guaranteed improvement.
+
+🔹 E. 4-layer, no residuals, dot-product decoder
+
+(upper bound)
+
+AUC: 0.943 ± 0.007
+
+AUPR: 0.644 ± 0.039
+
+Best raw performance
+
+More depth, more mixing
