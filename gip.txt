@@ -143,7 +143,7 @@ Mean ± Std over seeds
 AUC  : 0.9289 ± 0.0073
 AUPR : 0.6157 ± 0.0417
 
-Layer 1
+GIP in Layer 2 only
 ========== FINAL SUMMARY ==========
 Seed 42: AUC=0.8768, AUPR=0.4991
 Seed 43: AUC=0.9306, AUPR=0.6395
@@ -155,7 +155,7 @@ Mean ± Std over seeds
 AUC  : 0.8995 ± 0.0317
 AUPR : 0.5037 ± 0.1034
 
-Layer 2 only SELECTED
+GIP in Layer 1 only: SELECTED
 ========== FINAL SUMMARY ==========
 Seed 42: AUC=0.9512, AUPR=0.7382
 Seed 43: AUC=0.9355, AUPR=0.6633
@@ -167,7 +167,7 @@ Mean ± Std over seeds
 AUC  : 0.9403 ± 0.0076
 AUPR : 0.6565 ± 0.0685
 
-GIP added
+GIP added both layers
 ========== FINAL SUMMARY ==========
 Seed 42: AUC=0.9179, AUPR=0.6143
 Seed 43: AUC=0.9057, AUPR=0.5792
