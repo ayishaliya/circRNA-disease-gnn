@@ -1,94 +1,68 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from torch_geometric.nn import HeteroConv, SAGEConv
+
 
 class HeteroGraphSAGE(nn.Module):
     """
-    3-layer heterogeneous GraphSAGE
-    Input → Hidden1 → Hidden2 → Output
+    4-layer heterogeneous GraphSAGE + GIP
+    Input → H1 → H2 → H3 → Output
     """
 
-    def __init__(self, in_channels, hidden_channels=64, out_channels=64, dropout=0.2):
+    def __init__(self, in_channels, hidden_channels=64,
+                 out_channels=64, dropout=0.2):
         super().__init__()
 
-        # -------- Layer 1: Input → Hidden --------
-        relations_1 = {
-            ("circRNA", "interacts", "miRNA"): SAGEConv((-1, -1), hidden_channels),
-            ("miRNA", "interacts", "disease"): SAGEConv((-1, -1), hidden_channels),
-            ("circRNA", "associated", "disease"): SAGEConv((-1, -1), hidden_channels),
+        # ----- All relations including GIP -----
+        relations = [
+            ("circRNA", "interacts", "miRNA"),
+            ("miRNA", "interacts", "disease"),
+            ("circRNA", "associated", "disease"),
+            ("miRNA", "rev_interacts", "circRNA"),
+            ("disease", "rev_interacts", "miRNA"),
+            ("disease", "rev_associated", "circRNA"),
 
-            ("miRNA", "rev_interacts", "circRNA"): SAGEConv((-1, -1), hidden_channels),
-            ("disease", "rev_interacts", "miRNA"): SAGEConv((-1, -1), hidden_channels),
-            ("disease", "rev_associated", "circRNA"): SAGEConv((-1, -1), hidden_channels),
+            # GIP relations
+            ("circRNA", "gip_sim", "circRNA"),
+            ("disease", "gip_sim", "disease"),
+        ]
 
-        }
+        # -------- Layer 1 --------
+        self.conv1 = HeteroConv(
+            {rel: SAGEConv((-1, -1), hidden_channels) for rel in relations},
+            aggr="mean"
+        )
 
-        # -------- Layer 2: Hidden → Hidden --------
-        relations_2 = {
-            ("circRNA", "interacts", "miRNA"): SAGEConv(hidden_channels, hidden_channels),
-            ("miRNA", "interacts", "disease"): SAGEConv(hidden_channels, hidden_channels),
-            ("circRNA", "associated", "disease"): SAGEConv(hidden_channels, hidden_channels),
+        # -------- Layer 2 --------
+        self.conv2 = HeteroConv(
+            {rel: SAGEConv(hidden_channels, hidden_channels) for rel in relations},
+            aggr="mean"
+        )
 
-            ("miRNA", "rev_interacts", "circRNA"): SAGEConv(hidden_channels, hidden_channels),
-            ("disease", "rev_interacts", "miRNA"): SAGEConv(hidden_channels, hidden_channels),
-            ("disease", "rev_associated", "circRNA"): SAGEConv(hidden_channels, hidden_channels),
-        }
-
-        # -------- Layer 3: Hidden → Output --------
-        relations_3 = {
-            ("circRNA", "interacts", "miRNA"): SAGEConv(hidden_channels, out_channels),
-            ("miRNA", "interacts", "disease"): SAGEConv(hidden_channels, out_channels),
-            ("circRNA", "associated", "disease"): SAGEConv(hidden_channels, out_channels),
-
-            ("miRNA", "rev_interacts", "circRNA"): SAGEConv(hidden_channels, out_channels),
-            ("disease", "rev_interacts", "miRNA"): SAGEConv(hidden_channels, out_channels),
-            ("disease", "rev_associated", "circRNA"): SAGEConv(hidden_channels, out_channels),
-
-            ("circRNA", "gip_sim", "circRNA"): SAGEConv(hidden_channels, out_channels),
-            ("miRNA", "gip_sim", "miRNA"): SAGEConv(hidden_channels, out_channels),
-
-           
-        }
-
-        self.conv1 = HeteroConv(relations_1, aggr="mean")
-        self.conv2 = HeteroConv(relations_2, aggr="mean")
-        self.conv3 = HeteroConv(relations_3, aggr="mean")
+        # -------- Layer 4 (Output) --------
+        self.conv3 = HeteroConv(
+            {rel: SAGEConv(hidden_channels, out_channels) for rel in relations},
+            aggr="mean"
+        )
 
         self.act = nn.ReLU()
         self.dropout = nn.Dropout(dropout)
 
-        # Residual connections (input → output)
-        self.res_lin_circ = nn.Linear(in_channels, out_channels)
-        self.res_lin_mir  = nn.Linear(in_channels, out_channels)
-        self.res_lin_dis  = nn.Linear(in_channels, out_channels)
-
     def forward(self, x_dict, edge_index_dict):
-        print("3Layer")
-        # -------- Hidden layer 1 --------
+
+        # Layer 1
         h1 = self.conv1(x_dict, edge_index_dict)
-        for k in h1:
-            h1[k] = self.dropout(self.act(h1[k]))
+        h1 = {k: self.dropout(self.act(v)) for k, v in h1.items()}
 
-        # -------- Hidden layer 2 --------
+        # Layer 2
         h2 = self.conv2(h1, edge_index_dict)
-        for k in h2:
-            h2[k] = self.dropout(self.act(h2[k]))
+        h2 = {k: self.dropout(self.act(v)) for k, v in h2.items()}
 
-        # -------- Output layer --------
+        # Output
         out = self.conv3(h2, edge_index_dict)
 
-        # Residuals
-        out_c = out["circRNA"]
-        out_m = out["miRNA"] 
-        out_d = out["disease"]
+        # Normalize embeddings
+        out = {k: F.normalize(v, p=2, dim=1) for k, v in out.items()}
 
-        # L2 normalization (good choice for dot-product decoder)
-        out_c = nn.functional.normalize(out_c, p=2, dim=1)
-        out_m = nn.functional.normalize(out_m, p=2, dim=1)
-        out_d = nn.functional.normalize(out_d, p=2, dim=1)
-
-        return {
-            "circRNA": out_c,
-            "miRNA": out_m,
-            "disease": out_d
-        }
+        return out
