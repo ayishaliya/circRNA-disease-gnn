@@ -187,11 +187,11 @@ python predict.py
 
 ## 👩‍💻 Team
 
-- Amna  
-- Ayisha Liya Thengilan  
+- Ayisha Liya 
+- Sneha Sudheesh   
 - Hina Parveen  
 - Isha Thahaniya  
-- Sneha Sudheesh  
+- Amna
 
 **Guides:** Dr. Ajish Kumar K.S  and Dr. Manu Madhavan
 
