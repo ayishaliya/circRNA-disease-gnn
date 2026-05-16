@@ -1,0 +1,9 @@
+node_type,pair,CKA
+circRNA,layer1→layer2,0.998528827451195
+circRNA,layer2→layer3,0.9951353708675911
+circRNA,layer3→layer4,0.6443909340056386
+circRNA,layer1→layer4,0.6249538652152118
+disease,layer1→layer2,0.9960182115473928
+disease,layer2→layer3,0.9984952425495218
+disease,layer3→layer4,0.6459888650833769
+disease,layer1→layer4,0.6880091265628631

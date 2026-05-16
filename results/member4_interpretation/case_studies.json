@@ -1,0 +1,29 @@
+[
+  {
+    "rank": 1,
+    "circRNA": "cdr1as",
+    "disease": "nasopharyngeal carcinoma",
+    "importance_score": 0.2788,
+    "n_explained_pairs": 20,
+    "literature_note": "TODO - search PubMed and fill this in",
+    "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/?term=cdr1as+nasopharyngeal+carcinoma"
+  },
+  {
+    "rank": 2,
+    "circRNA": "cdr1as",
+    "disease": "osteosarcoma",
+    "importance_score": 0.2788,
+    "n_explained_pairs": 20,
+    "literature_note": "TODO - search PubMed and fill this in",
+    "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/?term=cdr1as+osteosarcoma"
+  },
+  {
+    "rank": 3,
+    "circRNA": "cdr1as",
+    "disease": "stomach neoplasms",
+    "importance_score": 0.2788,
+    "n_explained_pairs": 20,
+    "literature_note": "TODO - search PubMed and fill this in",
+    "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/?term=cdr1as+stomach+neoplasms"
+  }
+]

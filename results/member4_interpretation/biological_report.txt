@@ -1,0 +1,77 @@
+=================================================================
+INTERPRETABILITY ANALYSIS REPORT - Member 4
+circRNA-Disease Association Prediction, GraphSAGE + GNNExplainer
+=================================================================
+
+1. MODEL AND METHODOLOGY
+----------------------------------------
+Architecture : 4-layer GraphSAGE encoder, hidden dim=64
+Graph        : circRNA-disease biological edges + GIP similarity edges
+Explainer    : GNNExplainer (Ying et al. NeurIPS 2019)
+               200 epochs, lr=0.01, sparsity regularisation
+
+Best model performance (from results/stage2.txt):
+  Mean AUC  = 0.943  (4-layer GraphSAGE)
+  Mean AUPR = 0.644
+
+2. NODE FEATURE IMPORTANCE
+----------------------------------------
+ rank           feature  mean_importance  std_importance
+    1            degree         0.425608        0.269111
+    2 betweenness_proxy         0.270220        0.175169
+    3        log_degree         0.251768        0.140006
+    4        is_circRNA         0.244494        0.151223
+    5        is_disease         0.229170        0.124894
+    6          is_miRNA         0.209297        0.031210
+
+Top feature   : degree  (0.4256)
+Second feature: betweenness_proxy  (0.2702)
+
+Structural features (degree/log/betweenness) = 49.8% of importance
+Node-type flags (is_circRNA/is_disease)      = 50.2% of importance
+
+3. EDGE TYPE IMPORTANCE
+----------------------------------------
+edge_dst_type  mean_importance  std_importance
+        miRNA         0.249015        0.149640
+      circRNA         0.247277        0.146222
+      disease         0.244469        0.140078
+
+4. ABLATION STUDY
+----------------------------------------
+Removing "mask GIP disease–disease" caused the largest AUC drop (-0.2209)
+
+5. GIP EDGE CONTRIBUTION
+----------------------------------------
+GIP edges improved Q1 AUC by 0.0703 vs Q4 by -0.0167
+
+6. TOP PREDICTED ASSOCIATIONS
+----------------------------------------
+Rank 1: cdr1as  ->  nasopharyngeal carcinoma
+        Importance: 0.2788
+        Literature: [TODO - search PubMed]
+
+Rank 2: cdr1as  ->  osteosarcoma
+        Importance: 0.2788
+        Literature: [TODO - search PubMed]
+
+Rank 3: cdr1as  ->  stomach neoplasms
+        Importance: 0.2788
+        Literature: [TODO - search PubMed]
+
+7. BIOLOGICAL INTERPRETATION
+----------------------------------------
+[FILL IN AFTER PUBMED SEARCH]
+
+For each top association, search:
+  https://pubmed.ncbi.nlm.nih.gov/?term=<circRNA_name>+<disease_name>
+
+If experimentally validated: the model successfully recovered a real signal.
+If not validated: this is a novel prediction for experimental follow-up.
+
+8. METHODOLOGY NOTE
+----------------------------------------
+Interpretability uses the GraphSAGE encoder backbone with dot-product predictor.
+The WeightedFusionPredictor is not explainable at the edge level.
+This is standard practice in GNN interpretability.
+=================================================================

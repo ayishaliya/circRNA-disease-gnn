@@ -1,0 +1,43 @@
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  SLIDE 1: What the Model Learned                                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  • Model: 3-layer HeteroGraphSAGE, no residuals, dot-product decoder        │
+│  • Performance: AUC 0.925 ± 0.006  |  AUPR 0.600 ± 0.029                   │
+│  • Heterogeneous graph: circRNA, miRNA, disease nodes + GIP similarity      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  SLIDE 2: Most Important Features                                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  • degree is #1 — the model favours well-connected hub nodes                │
+│  • betweenness_proxy — bridging nodes matter biologically                   │
+│  • Node type (circRNA / miRNA / disease) contributes meaningful signal      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  SLIDE 3: Critical Relation — GIP Disease Similarity                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  • Removing disease–disease GIP edges → AUC drops by 0.221 (−31%)          │
+│  • Model relies on disease similarity to generalise to rare diseases         │
+│  • Removing circRNA–disease train edges → AUC IMPROVES (+0.097)             │
+│    → Model predicts via miRNA pathways, not memorisation                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  SLIDE 4: Top Novel Predictions                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  ★ hsa_circ_0001859  ↔  Rheumatoid arthritis  (inflammation pathway)       │
+│  ★ circ-foxo3        ↔  Glioblastoma          (tumour suppressor axis)     │
+│  ★ hsa_circ_0008039  ↔  Breast neoplasms      (literature-confirmed)       │
+│  ★ circsmarca5       ↔  Cardiovascular disease (cardiac ncRNA network)      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  SLIDE 5: Validation Roadmap                                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Step 1. qPCR — confirm differential expression in disease tissue           │
+│  Step 2. Luciferase assay — validate miRNA sponging activity                │
+│  Step 3. RNA pulldown / RIP-seq — confirm RNA–protein interactions          │
+│  Step 4. In-vivo knockdown — assess phenotypic effect in disease model      │
+└─────────────────────────────────────────────────────────────────────────────┘
